@@ -2,13 +2,8 @@ from KayakPage.Kayak import Kayak
 from time import sleep
 
 bot = Kayak()
-bot.land_first_page()
+bot.start_kayak("KRK", "VLC", "2022-06-01", "2022-06-05")
 sleep(5)
-bot.cheapest_option()
-sleep(5)
-# bot.load_more()
 bot.page_scrape()
+sleep(10)
 bot.__exit__()
-
-
-

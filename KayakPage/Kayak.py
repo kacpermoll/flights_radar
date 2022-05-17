@@ -3,6 +3,9 @@ import KayakPage.constants as const
 from random import randint
 from time import sleep, strftime
 import pandas as pd
+# from selenium.webdriver.common.keys import Keys
+import smtplib
+from email.mime.multipart import MIMEMultipart
 
 
 class Kayak():
@@ -131,3 +134,14 @@ class Kayak():
         # Adding a column with the date of scraping
         flights_df['timestamp'] = strftime("%Y-%m-%d %H:%M") 
         flights_df.to_excel("output.xlsx", index=False)  
+
+
+    def start_kayak(self, city_from, city_to, date_start, date_end):
+        """City codes - it's the IATA codes!
+        Date format -  YYYY-MM-DD"""
+
+        kayak = ('https://www.kayak.pl/flights/' + city_from + '-' + city_to +
+                '/' + date_start + '-flexible-3days/' + date_end + '-flexible-3days?sort=price_a')
+        self.driver.get(kayak)
+        sleep(randint(8,10))
+        

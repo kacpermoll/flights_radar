@@ -1,2 +1,2 @@
-BASE_URL = "https://www.kayak.pl/flights/BER-OSL/2022-06-21-flexible/2022-06-21-flexible?sort=bestflight_a"
+BASE_URL = "https://www.kayak.pl/"
 PATH_TO_DRIVER = ".\chromedriver.exe"
