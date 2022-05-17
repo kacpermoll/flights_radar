@@ -77,90 +77,57 @@ class Kayak():
                 b_travels_l[n][4] = " ".join(b_travels_l[n][4:6])
                 del b_travels_l[n][5]
 
-        print(a_travels_l)
-        print(b_travels_l)
-        # raise SystemExit
-
-        # a_duration = []
-        # a_section_names = []
-        # for n in a_travels_l:
-        #     # Separate the time from the cities
-        #     a_section_names.append(''.join(n.split()[2:5]))
-        #     a_duration.append(''.join(n.split()[0:2]))
-        # b_duration = []
-        # b_section_names = []
-        # for n in b_travels_l:
-        #     # Separate the time from the cities
-        #     b_section_names.append(''.join(n.split()[2:5]))
-        #     b_duration.append(''.join(n.split()[0:2]))
-        # print(a_duration)
-        # xp_dates = '//div[@class="section date"]'
-        # dates = self.driver.find_elements_by_xpath(xp_dates)
-        # dates_list = [value.text for value in dates]
-        # a_date_list = dates_list[::2]
-        # b_date_list = dates_list[1::2]
-        # # Separating the weekday from the day
-        # a_day = [value.split()[0] for value in a_date_list]
-        # a_weekday = [value.split()[1] for value in a_date_list]
-        # b_day = [value.split()[0] for value in b_date_list]
-        # b_weekday = [value.split()[1] for value in b_date_list]
+        # Scraping prices
+        price = self.driver.find_elements_by_xpath('//*[@class="multibook-dropdown"]')
+        price_l_t = [value.text for value in price]
         
-        # # getting the prices
-        # xp_prices = '//a[@class="booking-link"]/span[@class="price option-text"]'
-        # prices = self.driver.find_elements_by_xpath(xp_prices)
-        # prices_list = [price.text.replace('$','') for price in prices if price.text != '']
-        # prices_list = list(map(int, prices_list))
+        # Since prices are scraped with unnecesary information, 
+        # we need to delete it and only keep the price that is first in each element
+        price_l = []
+        for n in price_l_t:
+            price_l.append(n.split()[0])
+       
 
-        # # the stops are a big list with one leg on the even index and second leg on odd index
-        # xp_stops = '//div[@class="section stops"]/div[1]'
-        # stops = self.driver.find_elements_by_xpath(xp_stops)
-        # stops_list = [stop.text[0].replace('n','0') for stop in stops]
-        # a_stop_list = stops_list[::2]
-        # b_stop_list = stops_list[1::2]
+        out_day, out_departure, out_arrival, out_departure_airport, out_arrival_airport, out_stops, out_duration = [], [], [], [], [], [], []
+        return_day, return_departure, return_arrival, return_departure_airport, return_arrival_airport, return_stops, return_duration = [], [], [], [], [], [], []
+        for n in range(len(a_travels_l)):
+            out_day.append(a_travels_l[n][0][:-1])
+            out_departure.append(a_travels_l[n][1].split(' – ')[0])
+            out_arrival.append(a_travels_l[n][1].split(' – ')[1])
+            out_departure_airport.append(a_travels_l[n][2])
+            out_arrival_airport.append(a_travels_l[n][3])
+            out_stops.append(a_travels_l[n][4])
+            out_duration.append(a_travels_l[n][5])
 
-        # xp_stops_cities = '//div[@class="section stops"]/div[2]'
-        # stops_cities = self.driver.find_elements_by_xpath(xp_stops_cities)
-        # stops_cities_list = [stop.text for stop in stops_cities]
-        # a_stop_name_list = stops_cities_list[::2]
-        # b_stop_name_list = stops_cities_list[1::2]
-        
-        # # this part gets me the airline company and the departure and arrival times, for both legs
-        # xp_schedule = '//div[@class="section times"]'
-        # schedules = self.driver.find_elements_by_xpath(xp_schedule)
-        # hours_list = []
-        # carrier_list = []
-        # for schedule in schedules:
-        #     hours_list.append(schedule.text.split('\n')[0])
-        #     carrier_list.append(schedule.text.split('\n')[1])
-        # # split the hours and carriers, between a and b legs
-        # a_hours = hours_list[::2]
-        # a_carrier = carrier_list[::2]
-        # b_hours = hours_list[1::2]
-        # b_carrier = carrier_list[1::2]
+            return_day.append(b_travels_l[n][0][:-1])
+            return_departure.append(b_travels_l[n][1].split(' – ')[0])
+            return_arrival.append(b_travels_l[n][1].split(' – ')[1])
+            return_departure_airport.append(b_travels_l[n][2])
+            return_arrival_airport.append(b_travels_l[n][3])
+            return_stops.append(b_travels_l[n][4])
+            return_duration.append(b_travels_l[n][5])
 
-        
-        # cols = (['Out Day', 'Out Time', 'Out Weekday', 'Out Airline', 'Out Cities', 'Out Duration', 'Out Stops', 'Out Stop Cities',
-        #         'Return Day', 'Return Time', 'Return Weekday', 'Return Airline', 'Return Cities', 'Return Duration', 'Return Stops', 'Return Stop Cities',
-        #         'Price'])
+        # Creating a dataframe from the scraped data
+        cols = (['Out Day', 'Out Departure', 'Out Arrival', 'Out Departure Airport', 'Out Arrival Airport', 'Out Stops', 'Out Duration',
+                'Return Day', 'Return Departure', 'Return Arrival', 'Return Departure Airport', 'Return Arrival Airport', 'Return Stops', 'Return Duration', 
+                'Price'])
 
-        # flights_df = pd.DataFrame({'Out Day': a_day,
-        #                         'Out Weekday': a_weekday,
-        #                         'Out Duration': a_duration,
-        #                         'Out Cities': a_section_names,
-        #                         'Return Day': b_day,
-        #                         'Return Weekday': b_weekday,
-        #                         'Return Duration': b_duration,
-        #                         'Return Cities': b_section_names,
-        #                         'Out Stops': a_stop_list,
-        #                         'Out Stop Cities': a_stop_name_list,
-        #                         'Return Stops': b_stop_list,
-        #                         'Return Stop Cities': b_stop_name_list,
-        #                         'Out Time': a_hours,
-        #                         'Out Airline': a_carrier,
-        #                         'Return Time': b_hours,
-        #                         'Return Airline': b_carrier,                           
-        #                         'Price': prices_list})[cols]
-        
-        # flights_df['timestamp'] = strftime("%Y%m%d-%H%M") # so we can know when it was scraped
-        # print(flights_df)
-        # return flights_df
+        flights_df = pd.DataFrame({'Out Day': out_day,
+                                    'Out Departure': out_departure,
+                                    'Out Arrival': out_arrival,
+                                    'Out Departure Airport': out_departure_airport,
+                                    'Out Arrival Airport': out_arrival_airport,
+                                    'Out Stops': out_stops,
+                                    'Out Duration': out_duration,
+                                    'Return Day': return_day,
+                                    'Return Departure': return_departure,
+                                    'Return Arrival': return_arrival,
+                                    'Return Departure Airport': return_departure_airport,
+                                    'Return Arrival Airport': return_arrival_airport,
+                                    'Return Stops': return_stops,
+                                    'Return Duration': return_duration,
+                                    'Price': price_l})[cols]
+
+        # Adding a column with the date of scraping
+        flights_df['timestamp'] = strftime("%Y-%m-%d %H:%M") 
+        flights_df.to_excel("output.xlsx", index=False)  
