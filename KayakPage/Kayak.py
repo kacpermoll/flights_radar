@@ -39,59 +39,61 @@ class Kayak():
 
     def page_scrape(self):
         """
-        This function takes care of the scraping part
+        This function takes care of scraping page and creating a dataframe
         """
-        # xp_sections = '//*[@class="section duration"]'
-        # sections = self.driver.find_elements_by_xpath(xp_sections)
-        # sections_list = [value.text for value in sections]
-        # section_a_list = sections_list[::2] # This is to separate the two flights
-        # section_b_list = sections_list[1::2] # This is to separate the two flights
-        # print(section_a_list[:3])
-        # print(section_b_list[:3])
         """
         a_(...) - outbound flight
         b_(...) - inbound flight
         (...)_l - list
-        """
-        a_days = self.driver.find_elements_by_xpath('//*[@class="resultInner"]')
-        a_days_l = [value.text for value in a_days]
-        print(a_days_l)
-        
-        # all_travels = self.driver.find_elements_by_xpath('//*[@class="depart-time base-time"]')
-        # print("\n\n\n\n\n\n")
-        # print(all_travels)
-        # print("\n\n\n\n\n\n")
-        # all_travels_list = [value.text for value in all_travels]
-        # print(all_travels_list)
-        # print(all_travels_list)
-        # print("I'm going to seperate the flights")
-        # # ['08.06.\n12:00 – 21:10\nKRK Balice\n‐\nVLC Walencja\n1 przes.\nLTN-STN\n9h 10min', 
-        # # '09.06.\n08:35 – 15:35\nVLC Walencja\n‐\nKRK Balice\n1 przes.\nBLQ\n7h 00min', 
-        # # '08.06.\n12:00 – 21:10\nKRK Balice\n‐\nVLC Walencja\n1 przes.\nLTN-STN\n9h 10min', 
-        # # '15.06.\n13:00 – 19:35\nVLC Walencja\n‐\nKRK Balice\n1 przes.\nMXP\n6h 35min']
-        # # Seperating inbound and outbound flights
-        # a_flights = all_travels_list[::2]
-        # b_flights = all_travels_list[1::2] 
-        # print(a_flights[:3])
-        # print(b_flights[:3])
+        (...)_t - temporary
+        """       
 
-        # # exit bot in case there occurs Captcha verification
-        # if section_a_flight_list == []:
-        #     raise SystemExit
-        
+        # Scraping all trips without prices
+        all_travels = self.driver.find_elements_by_xpath('//*[@class="container"]')
+        all_travels_l = [value.text for value in all_travels]
+
+        # Dividing the trips into outbound and inbound
+        a_travels_l = []
+        b_travels_l = []
+        [a_travels_l.append(n.split('\n')) for n in all_travels_l[::2]]
+        [b_travels_l.append(n.split('\n')) for n in all_travels_l[1::2]]
+
+        if len(a_travels_l) != len(b_travels_l):
+            print("Error: The number of outbound and inbound trips is not equal")
+            return
+
+        # Deleting element which contains such value: " - "
+        for n in range(len(a_travels_l)):
+            del a_travels_l[n][3]
+            del b_travels_l[n][3]
+
+        # Merging elements which contain information about stopover (change)
+        for n in range(len(a_travels_l)):
+            if len(a_travels_l[n]) > 6:
+                a_travels_l[n][4] = " ".join(a_travels_l[n][4:6])
+                del a_travels_l[n][5]
+
+            if len(b_travels_l[n]) > 6:
+                b_travels_l[n][4] = " ".join(b_travels_l[n][4:6])
+                del b_travels_l[n][5]
+
+        print(a_travels_l)
+        print(b_travels_l)
+        # raise SystemExit
+
         # a_duration = []
         # a_section_names = []
-        # for n in section_a_flight_list:
+        # for n in a_travels_l:
         #     # Separate the time from the cities
         #     a_section_names.append(''.join(n.split()[2:5]))
         #     a_duration.append(''.join(n.split()[0:2]))
         # b_duration = []
         # b_section_names = []
-        # for n in section_b_flight_list:
+        # for n in b_travels_l:
         #     # Separate the time from the cities
         #     b_section_names.append(''.join(n.split()[2:5]))
         #     b_duration.append(''.join(n.split()[0:2]))
-
+        # print(a_duration)
         # xp_dates = '//div[@class="section date"]'
         # dates = self.driver.find_elements_by_xpath(xp_dates)
         # dates_list = [value.text for value in dates]
@@ -160,5 +162,5 @@ class Kayak():
         #                         'Price': prices_list})[cols]
         
         # flights_df['timestamp'] = strftime("%Y%m%d-%H%M") # so we can know when it was scraped
+        # print(flights_df)
         # return flights_df
-    
